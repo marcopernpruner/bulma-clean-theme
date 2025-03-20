@@ -4,9 +4,9 @@
 {% endif %}
 
 {% if page.show_sidebar and has_left_sidebar %}
-    {% assign content_width = 'is-4' %}
+    {% assign content_width = 'is-6' %}
 {% elsif page.show_sidebar or has_left_sidebar %}
-    {% assign content_width = 'is-8' %}
+    {% assign content_width = 'is-9' %}
 {% else %}
     {% assign content_width = 'is-12' %}
 {% endif %}
@@ -21,6 +21,9 @@
         {% if site.cookie_policy %}
             {% include cookie-banner.html %}
         {% endif %}
+        {% unless site.hide_parentFBK or page.hide_parentFBK %}
+            {% include parentFBK.html %}
+        {% endunless %}
         {% include header.html %}
         {% unless page.hide_hero %}
             {% include hero.html %}
