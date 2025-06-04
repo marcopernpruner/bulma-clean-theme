@@ -1,53 +1,90 @@
-{% assign details = include.details %}
-{% assign sort = include.sort %}
 {% assign source = include.source %}
+{% assign style = include.style | default: "card" %}
+{% assign sort = include.sort | default: "name" %}
+{% assign details = include.details | default: "" %}
 
-{% if source.size > 0 %}
-<ul class="tools">
-    {% assign toolsFromId = "" | split: "" %}
-    {% for tool in source %}
-        {% assign toolFromId = site.data.tools | where: "id", tool %}
-        {% assign toolFromIdLabel = site.data.tools | where: "id", tool.id %}
-        {% if toolFromId.size > 0 %}
-            {% assign toolsFromId = toolsFromId | push: toolFromId[0] %}
-        {% elsif toolFromIdLabel.size > 0 %}
-            {% assign toolsFromId = toolsFromId | push: toolFromIdLabel[0] %}
+{% if source and source.size > 0 %}
+    {% assign tools = "" | split: "" %}
+
+    {% for item in source %}
+        {% if item.id %}
+            {% assign match = site.data.tools | where: "id", item.id | first %}
+        {% else %}
+            {% assign match = site.data.tools | where: "id", item | first %}
+        {% endif %}
+        {% if match %}
+            {% assign tools = tools | push: match %}
         {% endif %}
     {% endfor %}
 
-    {% if sort %}
-        {% if sort == "none" %}
-            {% assign toolsSorted = toolsFromId %}
-        {% else %}
-            {% assign toolsSorted = toolsFromId | sort_natural: sort %}
-        {% endif %}
-    {% else %}
-        {% assign toolsSorted = toolsFromId | sort_natural: "name" %}
+    {% if sort != "none" %}
+        {% assign tools = tools | sort_natural: sort %}
     {% endif %}
 
-    {%- for tool in toolsSorted -%}
+    {% if style == "card" %}
+        <div class="columns is-multiline">
+    {% elsif style == "list" %}
+        <ul class="tools">
+    {% endif %}
+
+    {% for tool in tools %}
         {%- assign linksArray = "" | split: "" -%}
-        {%- if tool.urlDocumentation %}
+        {% if tool.urlDocumentation %}
             {%- assign string = '<a href="' | append: tool.urlDocumentation | append: '">documentation</a>' -%}
             {%- assign linksArray = linksArray | push: string -%}
-        {%- endif -%}
-        {%- if tool.urlCode %}
+        {% endif %}
+        {% if tool.urlCode %}
             {%- assign string = '<a href="' | append: tool.urlCode | append: '">code</a>' -%}
             {%- assign linksArray = linksArray | push: string -%}
-        {%- endif -%}
+        {% endif %}
+        {% assign linksString = linksArray | join: ", " %}
         {%- if linksArray.size > 0 -%}
             {%- assign linksString = linksArray | join: ", " | prepend: " [" | append: "]" -%}
         {%- else -%}
             {%- assign linksString = "" -%}
         {%- endif -%}
-        <li class="item tool">
-            <b>{{ tool.name }}</b>{% if tool.urlDocumentation %}{{ linksString }}{% endif %}
-            {% if tool.description and details contains "description" %}
+
+        {% if style == "card" %}
+            <div class="column is-3-desktop is-4-tablet tool">
+                <a href="{{ tool.urlDocumentation }}">
+                    <div class="card tool">
+                        <div class="card-image">
+                            <figure class="image">
+                                {% if tool.logo %}
+                                    <img src="{{ site.baseurl }}/assets/areas/tools/{{ tool.logo }}" alt="{{ tool.name }}">
+                                {% else %}
+                                    <img class="default" alt="{{ tool.name }}">
+                                {% endif %}
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <p class="title is-4">{{ tool.name }}</p>
+                            {% if tool.nameAddon %}
+                                <p class="subtitle is-4 addon"><small>{{ tool.nameAddon }}</small></p>
+                            {% endif %}
+                            <hr />
+                            {% if tool.description %}
+                                <p class="subtitle is-4 addon"><small>{{ tool.description }}</small></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% elsif style == "list" %}
+            <li class="item tool">
+                <b>{{ tool.name }}</b> {% if tool.nameAddon %}({{ tool.nameAddon }}){% endif %}{{ linksString }}
+                {% if tool.description and details contains "description" %}
                 <ul class="description">
                     <li>{{ tool.description }}</li>
                 </ul>
-            {% endif %}
-        </li>
+                {% endif %}
+            </li>
+        {% endif %}
     {% endfor %}
-</ul>
+
+    {% if style == "card" %}
+        </div>
+    {% elsif style == "list" %}
+        </ul>
+    {% endif %}
 {% endif %}

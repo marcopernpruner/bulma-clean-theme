@@ -1,21 +1,25 @@
-- name: Docs
-  link: /docs/
-- name: Example Pages
-  link: /#
+#- name: Collaborations
+ # link: /collaborations
+- name: Dissemination
+  link: /dissemination/
+- name: Events
+  link: /events/
+- name: News
+  link: /news/
+- name: People
+  link: /people/
   dropdown:
-    - name: Landing Page With Callouts
-      link: /landing/
-    - name: Promo Page
-      link: /promo-page/
-    - name: Sponsors Page
-      link: /sponsors/
-    - name: Image Gallery
-      link: /gallery/
-    - name: Products
-      link: /products/
-    - name: Recipe Page
-      link: /example-recipe/
-    - name: Showcase
-      link: /showcase/
-- name: Blog
-  link: /blog/
+    - name: The Unit
+      link: /people/unit
+    - name: Current Members
+      link: /people/
+    - name: Former Members
+      link: /people/former
+- name: Projects
+  link: /projects/
+- name: Publications
+  link: /publications/
+- name: Teaching
+  link: /teaching/
+- name: Tools
+  link: /tools/

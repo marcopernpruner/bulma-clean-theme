@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 Gem::Specification.new do |spec|
-  spec.name          = "bulma-clean-theme"
-  spec.version       = "1.2.0"
-  spec.authors       = ["chrisrhymes"]
-  spec.email         = ["csrhymes@gmail.com"]
+  spec.name          = "fbk-cs-website-theme"
+  spec.version       = "0.0.1"
+  spec.authors       = ["chrisrhymes", "marcopernpruner"]
+  spec.email         = ["csrhymes@gmail.com", "mpernpruner@fbk.eu"]
 
-  spec.summary       = "Clean and simple Jekyll theme built using Bulma"
+  spec.summary       = "Theme for FBK CS websites"
+  spec.description   = "A customized version of the bulma-clean-theme by chrisrhymes, to serve as a remote theme for websites within the Center for Cybersecurity of Fondazione Bruno Kessler."
   spec.homepage      = "https://www.github.com/chrisrhymes/bulma-clean-theme"
   spec.license       = "MIT"
 

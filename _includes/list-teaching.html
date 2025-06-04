@@ -1,14 +1,9 @@
-{% assign sort = include.sort %}
-{% if include.source %}
-    {% assign source = include.source %}
-{% endif %}
-{% if include.style %}
-    {% assign style = include.style %}
-{% else %}
-    {% assign style = "table" %}
-{% endif %}
+{% assign source = include.source %}
+{% assign details = include.details | default: "" %}
+{% assign sort = include.sort | default: "name" %}
+{% assign style = include.style | default: "table" %}
 
-{% if source.size > 0 %}
+{% if source and source.size > 0 %}
     {% if style == "table" %}
         <table class="teaching">
             <thead>
@@ -26,28 +21,23 @@
         <ul class="teaching">
     {% endif %}
 
-    {% assign coursesFromId = "" | split: "" %}
-    {% for course in source %}
-        {% assign courseFromId = site.data.teaching | where: "id", course %}
-        {% assign courseFromIdLabel = site.data.teaching | where: "id", course.id %}
-        {% if courseFromId.size > 0 %}
-            {% assign coursesFromId = coursesFromId | push: courseFromId[0] %}
-        {% elsif courseFromIdLabel.size > 0 %}
-            {% assign coursesFromId = coursesFromId | push: courseFromIdLabel[0] %}
+    {% assign courses = "" | split: "" %}
+    {% for item in source %}
+        {% if item.id %}
+            {% assign match = site.data.teaching | where: "id", item.id | first %}
+        {% else %}
+            {% assign match = site.data.teaching | where: "id", item | first %}
+        {% endif %}
+        {% if match %}
+            {% assign courses = courses | push: match %}
         {% endif %}
     {% endfor %}
 
-    {% if sort %}
-        {% if sort == "none" %}
-            {% assign coursesSorted = coursesFromId %}
-        {% else %}
-            {% assign coursesSorted = coursesFromId | sort_natural: sort %}
-        {% endif %}
-    {% else %}
-        {% assign coursesSorted = coursesFromId | sort_natural: "name" %}
+    {% if sort != "none" %}
+        {% assign courses = courses | sort_natural: sort %}
     {% endif %}
 
-    {%- for course in coursesSorted -%}
+    {%- for course in courses -%}
         {% assign lecturers = "" | split: "" %}
         {%- if course.lecturer -%}
             {%- if course.lecturer | first -%}

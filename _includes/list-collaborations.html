@@ -1,56 +1,67 @@
 {% assign source = include.source %}
-{% assign style = include.style %}
+{% assign style = include.style | default: "card" %}
 
-{% if source.size > 0 %}
-    {% if style == "card" %}
-        <div class="columns is-multiline">
-    {% elsif style == "list" %}
-        <ul class="collaborations">
-    {% endif %}
-
-    {% assign collaborationsFromId = "" | split: "" %}
-    {% for collaboration in source %}
-        {% assign collaborationFromId = site.data.collaborations | where: "id", collaboration %}
-        {% assign collaborationFromIdLabel = site.data.collaborations | where: "id", collaboration.id %}
-        {% if collaborationFromId.size > 0 %}
-            {% assign collaborationsFromId = collaborationsFromId | push: collaborationFromId[0] %}
-        {% elsif collaborationFromIdLabel.size > 0 %}
-            {% assign collaborationsFromId = collaborationsFromId | push: collaborationFromIdLabel[0] %}
+{% if source and source.size > 0 %}
+    {% assign collaborations = "" | split: "" %}
+    {% for item in source %}
+        {% if item.id %}
+            {% assign match = site.data.collaborations | where: "id", item.id | first %}
+        {% else %}
+            {% assign match = site.data.collaborations | where: "id", item | first %}
+        {% endif %}
+        {% if match %}
+            {% assign collaborations = collaborations | push: match %}
         {% endif %}
     {% endfor %}
-    {% assign collaborationsSorted = collaborationsFromId | sort: "name" %}
-    {%- for collaboration in collaborationsSorted -%}
+
+    {% assign collaborations = collaborations | sort: "name" %}
+
+    {% if collaborations.size > 0 %}
         {% if style == "card" %}
-            <div class="column is-4-desktop is-6-tablet collaboration">
-                <a href="{{ collaboration.internalUrl | prepend: site.baseurl }}">
-                    <div class="card enterprise">
-                        <div class="card-image">
-                            <figure class="image">
-                                {% if collaboration.logo %}
-                                    <img src="{{ site.baseurl }}/assets/areas/collaborations/{{ collaboration.logo }}" alt="{{ collaboration.name }}" />
-                                {% else %}
-                                    <img class="default" alt="{{ collaboration.name }}" />
+            <div class="columns is-multiline">
+        {% elsif style == "list" %}
+            <ul class="collaborations">
+        {% endif %}
+
+        {% for collaboration in collaborations %}
+            {% if style == "card" %}
+                <div class="column is-4-desktop is-6-tablet collaboration">
+                    <a href="{{ collaboration.internalUrl | prepend: site.baseurl }}">
+                        <div class="card enterprise">
+                            <div class="card-image">
+                                <figure class="image">
+                                    {% if collaboration.logo %}
+                                        <img src="{{ site.baseurl }}/assets/areas/collaborations/{{ collaboration.logo }}" alt="{{ collaboration.name }}">
+                                    {% else %}
+                                        <img class="default" alt="{{ collaboration.name }}">
+                                    {% endif %}
+                                </figure>
+                            </div>
+                            <div class="card-content">
+                                <p class="title is-4">
+                                    {{ collaboration.name }}
+                                    {% if collaboration.acronym %} ({{ collaboration.acronym }}){% endif %}
+                                </p>
+                                {% if collaboration.description %}
+                                    <p class="subtitle is-4">{{ collaboration.description }}</p>
                                 {% endif %}
-                            </figure>
+                            </div>
                         </div>
-                        <div class="card-content">
-                            <p class="title is-4">{{ collaboration.name }}{% if collaboration.acronym %} ({{ collaboration.acronym}}){% endif %}</p>
-                            {% if collaboration.description %}<p class="subtitle is-4">{{ collaboration.description }}</p>{% endif %}
-                        </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
+            {% elsif style == "list" %}
+                <li class="item collaboration">
+                    <a href="{{ collaboration.internalUrl | prepend: site.baseurl }}">
+                        <b>{{ collaboration.name }}</b>
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if style == "card" %}
             </div>
         {% elsif style == "list" %}
-            <li class="item collaboration">
-                <a href="{{ collaboration.internalUrl | prepend: site.baseurl }}"><b>{{ collaboration.name }}</b></a>
-            </li>
+            </ul>
         {% endif %}
-    {% endfor %}
-
-    {% if style == "card" %}
-        </div>
-    {% elsif style == "list" %}
-        </ul>
     {% endif %}
-
 {% endif %}

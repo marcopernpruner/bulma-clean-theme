@@ -2,7 +2,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="{{ site.theme_color | default: '#ffffff' }}">
+    {% if page.title == site.title -%}
+        <title>{{ site.title }} - {{ site.tagline }}</title>
+    {%- else -%}
+        <title>{{ page.title }} - {{ site.title }}</title>
+    {%- endif %}
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/app.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/theme.css">
     <link
         rel="shortcut icon"
         type="image/png"
@@ -34,4 +40,12 @@
         {%- include google-analytics.html -%}
     {%- endif -%}
     {%- include head-scripts.html -%}
+
+    <style>
+        :root {
+            --logo-default: url('{% if site.entity_type == "unit" %}{{ site.logos.unit.symbol.default | default: site.logos.unit.regular.default }}{% elsif site.entity_type == "center" %}}{{ site.logos.center.symbol.default | default: site.logos.center.regular.default }}{% endif %}');
+            --primary-light: {{ site.primary_color_light | default: "#0068b4" }};
+            --primary-dark: {{ site.primary_color_dark | default: "#02406e" }};
+        }
+    </style>
 </head>

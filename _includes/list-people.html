@@ -1,36 +1,31 @@
 {% assign source = include.source %}
-{% assign details = include.details %}
-{% assign sort = include.sort %}
-{% assign style = include.style %}
+{% assign details = include.details | default: "" %}
+{% assign sort = include.sort | default: "name" %}
+{% assign style = include.style | default: "card" %}
 
-{% if source.size > 0 %}
+{% if source and source.size > 0 %}
 <div class="columns is-multiline">
     {% if style == "list" %}    
         <div class="column is-12-desktop is-12-tablet">
             <ul>
     {% endif %}
 
-    {% assign peopleFromId = "" | split: "" %}
-    {% for person in source %}
-        {% assign personFromId = site.data.people | where: "id", person %}
-        {% assign personFromIdLabel = site.data.people | where: "id", person.personId %}
-        {% if personFromId.size > 0 %}
-            {% assign peopleFromId = peopleFromId | push: personFromId[0] %}
-        {% elsif personFromIdLabel.size > 0 %}
-            {% assign peopleFromId = peopleFromId | push: personFromIdLabel[0] %}
+    {% assign people = "" | split: "" %}
+    {% for entry in source %}
+        {% if entry.personId %}
+            {% assign person = site.data.people | where: "id", entry.personId | first %}
+        {% else %}
+            {% assign person = site.data.people | where: "id", entry | first %}
+        {% endif %}
+        {% if person %}
+            {% assign people = people | push: person %}
         {% endif %}
     {% endfor %}
 
-    {% if sort %}
-        {% assign people = peopleFromId | sort_natural: sort %}
-    {% else %}
-        {% if sort == "none" %}
-            {% assign people = peopleFromId %}
-        {% else %}
-            {% assign people = peopleFromId | sort_natural: surname %}
-        {% endif %}
+    {% if sort != "none" %}
+        {% assign people = people | sort_natural: sort %}
     {% endif %}
-    
+
     {% for person in people %}
         {% assign additionalInfo = source | where: "personId", person.id %}
         {% if additionalInfo.size == 1 %}
@@ -219,25 +214,11 @@
             <div class="column is-one-fifth-desktop is-4-tablet">
                 <div class="card person">
                     {% if details contains "picture" %}
-                        {% assign staticImageName = person.id | append: ".jpg" %}
-                        {% assign staticImageNameNoAccents = staticImageName | replace: 'à', 'a' | replace: 'è', 'e'  | replace: 'ì', 'i'  | replace: 'ò', 'o'  | replace: 'ù', 'u' %}
-                        {% assign staticImage = site.static_files | where_exp: "file", "file.name == staticImageNameNoAccents" %}
-
-                        {% if person.image %}
-                            {% assign personImage = person.image %}
-                        {% elsif staticImage.size == 1 %}
-                            {% assign personImage = staticImage[0].path %}
-                        {% elsif person.usernameFBK %}
-                            {% capture personImage %}https://my.fbk.eu/fbk-api/v2/picture/{{ person.usernameFBK }}?w=500{% endcapture %}
-                        {% elsif person.email %}
-                            {% if splitEmail[1] == "fbk.eu" %}
-                                {% capture personImage %}https://my.fbk.eu/fbk-api/v2/picture/{{ splitEmail[0] }}?w=500{% endcapture %}
-                            {% else %}
-                                {% capture personImage %}/assets/images/no-user.jpg{% endcapture %}
-                            {% endif %}
-                        {% else %}
-                            {% capture personImage %}/assets/images/no-user.jpg{% endcapture %}
-                        {% endif %}
+                        {% assign personImage = include.person | prepend: "" %}
+                        {% capture personImage %}
+                            {% include person-image.html person=person %}
+                        {% endcapture %}
+                        
                         {% if personImage != "" %}
                             <div class="card-image">
                                 <figure class="image">

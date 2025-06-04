@@ -9,7 +9,8 @@ layout: page
     {% assign collaboration = nil %}
 {% endif %}
 
-<span id="set-title">{{ collaboration.name }}{% if collaboration.acronym %} ({{ collaboration.acronym }}){% endif %}</span>
+<span id="set-title">{{ collaboration.name }}</span>
+{% if collaboration.acronym %}<span id="set-subtitle">{{ collaboration.acronym }}</span>{% endif %}
 
 <div class="columns collaboration is-multiline">
     <div class="column overview is-12">
@@ -27,7 +28,6 @@ layout: page
             <h1 id="title-details">Details</h1>
             <ul class="no-bullet">
                 {% if collaboration.startYear or collaboration.endYear %}<li><b>Period</b>:{% if collaboration.startYear %} from {{ collaboration.startYear }}{% endif %}{% if collaboration.endYear %} until {{ collaboration.endYear }}{% endif %}.</li>{% endif %}
-
                 {% if collaboration.officialUrl %}<li><b>Website</b>: <a href="{{ collaborationFromId.officialUrl }}">{{ collaboration.officialUrl }}</a></li>{% endif %}
             </ul>
         </div>

@@ -1,14 +1,10 @@
-{% assign sort = include.sort %}
-{% if include.source %}
-    {% assign source = include.source %}
-{% endif %}
-{% if include.style %}
-    {% assign style = include.style %}
-{% else %}
-    {% assign style = "table" %}
-{% endif %}
+{% assign source = include.source %}
+{% assign details = include.details | default: "" %}
+{% assign sort = include.sort | default: "startDate" %}
+{% assign sortReverse = include.sortReverse | default: "true" %}
+{% assign style = include.style | default: "table" %}
 
-{% if source.size > 0 %}
+{% if source and source.size > 0 %}
     {% if style == "table" %}
         <table class="dissemination">
             <thead>
@@ -26,28 +22,26 @@
         <ul class="dissemination">
     {% endif %}
 
-    {% assign disseminationsFromId = "" | split: "" %}
-    {% for dissemination in source %}
-        {% assign disseminationFromId = site.data.dissemination | where: "id", dissemination %}
-        {% assign disseminationFromIdLabel = site.data.dissemination | where: "id", dissemination.id %}
-        {% if disseminationFromId.size > 0 %}
-            {% assign disseminationsFromId = disseminationsFromId | push: disseminationFromId[0] %}
-        {% elsif disseminationFromIdLabel.size > 0  %}
-            {% assign disseminationsFromId = disseminationsFromId | push: disseminationFromIdLabel[0] %}
+    {% assign disseminations = "" | split: "" %}
+    {% for item in source %}
+        {% if item.id %}
+            {% assign match = site.data.dissemination | where: "id", item.id | first %}
+        {% else %}
+            {% assign match = site.data.dissemination | where: "id", item | first %}
+        {% endif %}
+        {% if match %}
+            {% assign disseminations = disseminations | push: match %}
         {% endif %}
     {% endfor %}
 
-    {% if sort %}
-        {% if sort == "none" %}
-            {% assign disseminationsSorted = disseminationsFromId %}
-        {% else %}
-            {% assign disseminationsSorted = disseminationsFromId | sort_natural: sort %}
+    {% if sort != "none" %}
+        {% assign disseminations = disseminations | sort_natural: sort %}
+        {% if sortReverse %}
+            {% assign disseminations = disseminations | reverse %}
         {% endif %}
-    {% else %}
-        {% assign disseminationsSorted = disseminationsFromId | sort: "startDate" | reverse %}
     {% endif %}
 
-    {%- for dissemination in disseminationsSorted -%}
+    {%- for dissemination in disseminations -%}
         {% assign participants = "" | split: "" %}
         {%- if dissemination.participants -%}
             {%- if dissemination.participants | first -%}
